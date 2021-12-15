@@ -1,4 +1,4 @@
-
+let nowTime = new Date(); // global variable for current time.
 
 let JSONex = [{ "SegmentId": 4, "SegmentName": "Deux-Montagnes-Bois-Franc", "Name": "Sainte-Dorothée", "StationId": 18 },
 { "SegmentId": 4, "SegmentName": "Deux-Montagnes-Bois-Franc", "Name": "Île-Bigras", "StationId": 17 },
@@ -32,7 +32,7 @@ function isValid(e) {
     let stationTo = document.getElementById("stationsTo").value;
     let date = document.getElementById("time").value;
 
-    let nowTime = new Date();
+    
     let chosenTime = new Date(date);
 
     user1.stationFrom = stationFrom;
@@ -50,21 +50,48 @@ function isValid(e) {
         alert("Error.");
 
     else {
-        getPath();      
+        getPath();
+
+        // Resetting form. => how?   
     }
 
 }
 
 async function getPath() {
     
+    // Get stops.
     let segmentPath = await fetch("http://10.101.0.12:8080/path/" + user1.stationFrom + "/" + user1.stationTo);
     let segmentPathJSON = await segmentPath.json();
     console.log(segmentPathJSON);
 
+    // Display station names from-to destination - so in-between locations.
     for (let i = 0; i < segmentPathJSON.length; i++) {
         document.getElementById("trip").appendChild(document.createElement("p"))
-        .appendChild(document.createTextNode(segmentPathJSON[i].Name))
+        .appendChild(document.createTextNode("Station "+ segmentPathJSON[i].Name + " Segment Id " + segmentPathJSON[i].SegmentId))
     }
+
+    // Get times.
+    console.log(nowTime.getTime(), user1.date.getTime());
+
+    
+
+    let schedules = "";
+
+    for (let i = 0; i < segmentPathJSON.length; i++) {
+        schedules += (await (await fetch("http://10.101.0.12:8080/schedule/" + segmentPathJSON[i].Name)).json())
+    }
+
+    // To extract the time from the JSON.
+    // event.toLocaleTimeString('en-US').
+
+
+    console.log(schedules);
+
+    // Creating an array to hold all schedule objects for stations.
+
+    
+
+
 }
 
 
