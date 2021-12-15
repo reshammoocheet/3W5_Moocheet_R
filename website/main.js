@@ -49,17 +49,22 @@ function isValid(e) {
     if (stationFrom == stationTo || date == "" || chosenTime < nowTime)
         alert("Error.");
 
-    else
-    {
-        document.getElementById("trip").innerHTML = getPath();
-        
+    else {
+        getPath();      
     }
-        
+
 }
 
 async function getPath() {
-    let segmentPathJSON = await fetch("http://10.101.0.12:8080/path/" + user1.stationFrom + "/" + user1.stationTo);
+    
+    let segmentPath = await fetch("http://10.101.0.12:8080/path/" + user1.stationFrom + "/" + user1.stationTo);
+    let segmentPathJSON = await segmentPath.json();
     console.log(segmentPathJSON);
+
+    for (let i = 0; i < segmentPathJSON.length; i++) {
+        document.getElementById("trip").appendChild(document.createElement("p"))
+        .appendChild(document.createTextNode(segmentPathJSON[i].Name))
+    }
 }
 
 
