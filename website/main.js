@@ -86,7 +86,7 @@ async function getPath() {
 
     // Get schedules from user connecting segment.
     if (finalSegment.length != 0) {
-        console.log(finalSegment[0]);
+        console.log(finalSegment);
         let schedulesConnect = await (await fetch("http://10.101.0.12:8080/schedule/" + finalSegment[0])).json();
 
         // Only consider times from second segment.
@@ -145,11 +145,8 @@ async function getPath() {
             }));
 
             // Convert start point time to seconds.
-
             timeString = theTime.toLocaleString('it-IT').split(',')[1].split(':');
-            startSeconds = timeString[0] * 60 * 60 + timeString[1] * 60 + Number(timeString[2]);
-
-
+            startSeconds = Number(timeString[0] * 60 * 60) + Number(timeString[1] * 60) + Number(timeString[2]);
         }
     }
     console.log("this is the closest value : " + theTime);
@@ -158,7 +155,7 @@ async function getPath() {
 
     // Display station names from-to destination - so in-between locations.
     // Get distances, speed and time.
-    let counter;
+    let counter = startSeconds;
     for (let i = 0; i < segmentPathJSON.length - 1; i++) {
 
         // Get distance between stations.
@@ -174,25 +171,20 @@ async function getPath() {
 
         let time = (distance / speed[0].AverageSpeed) * 60 * 60;
         console.log(" this is how long from " + start + " to " + end + " : " + time + " seconds.");
-        counter = Math.round(startSeconds + time);
-        // Found this conversion method online.
-        console.log(counter);
-        console.log("You'll be at " + end + " at " + new Date(counter * 1000).toISOString().substr(11,8));
+        counter += time;
+        console.log("counter is " + Math.round(counter));
+
 
         document.getElementById("times").appendChild(document.createElement("p"))
             .appendChild(document.createTextNode(end + " at " + new Date(counter * 1000).toISOString().substr(11,8)));
     }
 
     // Appending text elements to display to user on screen. => Stations + Times.
-    document.getElementById("trip").appendChild(document.createElement("h2"))
-        .appendChild(document.createTextNode("Starting at " + theTime + user.stationFrom));
+    document.getElementById("trip").appendChild(document.createElement("h2")).appendChild(document.createTextNode("Starting at " + theTime + user.stationFrom));
 
-    for (let i = 0; i <= segmentPathJSON.length - 1; i++) {
+    for (let i = 0; i < segmentPathJSON.length; i++) {
         document.getElementById("trip").appendChild(document.createElement("p"))
             .appendChild(document.createTextNode("Station " + segmentPathJSON[i].Name + " Segment Id " + segmentPathJSON[i].SegmentId));
-
-        // Times.
-
     }
 
 
