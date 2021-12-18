@@ -178,6 +178,9 @@ async function getPath() {
         // Found this conversion method online.
         console.log(counter);
         console.log("You'll be at " + end + " at " + new Date(counter * 1000).toISOString().substr(11,8));
+
+        document.getElementById("times").appendChild(document.createElement("p"))
+            .appendChild(document.createTextNode(end + " at " + new Date(counter * 1000).toISOString().substr(11,8)));
     }
 
     // Appending text elements to display to user on screen. => Stations + Times.
