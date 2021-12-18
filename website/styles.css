@@ -1,7 +1,26 @@
 * {
     box-sizing: border-box;
+    font-family: "Lucida Console", "Courier New", monospace;
 }
 
 h1 {
     text-align: center;
 }
+
+#container {
+    display: flex;
+    flex-direction: row;
+    width: auto;
+}
+
+#trips {
+    flex: 1;
+}
+
+#times {
+    flex : 1;
+    padding-left: 2em;
+    padding-top: 2.1em;
+    margin-left: 10px;
+}
+
