@@ -1,25 +1,16 @@
 let nowTime = new Date(); // global variable for current time.
 
-let JSONex = [{ "SegmentId": 4, "SegmentName": "Deux-Montagnes-Bois-Franc", "Name": "Sainte-Dorothée", "StationId": 18 },
-{ "SegmentId": 4, "SegmentName": "Deux-Montagnes-Bois-Franc", "Name": "Île-Bigras", "StationId": 17 },
-{ "SegmentId": 4, "SegmentName": "Deux-Montagnes-Bois-Franc", "Name": "Pierrefonds-Roxboro", "StationId": 16 },
-{ "SegmentId": 4, "SegmentName": "Deux-Montagnes-Bois-Franc", "Name": "Sunnybrooke", "StationId": 15 },
-{ "SegmentId": 4, "SegmentName": "Deux-Montagnes-Bois-Franc", "Name": "Bois-Franc", "StationId": 14 },
-{ "SegmentId": 7, "SegmentName": "Bois-Franc-YUL-Aéroport-Montréal-Trudeau", "Name": "Bois-Franc", "StationId": 14 },
-{ "SegmentId": 7, "SegmentName": "Bois-Franc-YUL-Aéroport-Montréal-Trudeau", "Name": "Marie-Curie", "StationId": 25 }];
-
-
 class User {
-    constructor(role, stationFrom, stationTo, date) {
+    constructor(role, stationFrom, stationTo, time) {
         this.role = role;
         this.stationFrom = stationFrom;
         this.stationTo = stationTo;
-        this.date = date;
+        this.time = time;
     }
 }
 
-
-let user1 = new User();
+// This is either the Customer or Admin.
+let user = new User();
 
 const form = document.getElementById("theForm");
 form.addEventListener("submit", isValid);
@@ -30,66 +21,58 @@ function isValid(e) {
     // First, let's get the values.
     let stationFrom = document.getElementById("stationsFrom").value;
     let stationTo = document.getElementById("stationsTo").value;
-    let date = document.getElementById("time").value;
 
-    
-    let chosenTime = new Date(date);
+    // Converting the time string to matching ones on schedules' API.
+    let time = new Date("1970-01-01 " + document.getElementById("time").value);
 
-    user1.stationFrom = stationFrom;
-    user1.stationTo = stationTo;
-    user1.date = chosenTime;
+    user = {
+        role,
+        stationFrom,
+        stationTo,
+        time
+    };
 
-    console.log(user1);
-
-    console.log("u chose " + chosenTime);
-
-    console.log(stationFrom, stationTo, "today is " + nowTime);
+    console.log(user.time);
 
     // When are we rejecting?
-    if (stationFrom == stationTo || date == "" || chosenTime < nowTime)
+    if (stationFrom == stationTo || user.time == "" || user.time.getHours() + user.time.getMinutes() < nowTime.getHours() + nowTime.getMinutes())
         alert("Error.");
 
     else {
         getPath();
-
         // Resetting form. => how?   
     }
 
 }
 
 async function getPath() {
-    
+
     // Get stops.
-    let segmentPath = await fetch("http://10.101.0.12:8080/path/" + user1.stationFrom + "/" + user1.stationTo);
+    let segmentPath = await fetch("http://10.101.0.12:8080/path/" + user.stationFrom + "/" + user.stationTo);
     let segmentPathJSON = await segmentPath.json();
     console.log(segmentPathJSON);
 
     // Display station names from-to destination - so in-between locations.
     for (let i = 0; i < segmentPathJSON.length; i++) {
         document.getElementById("trip").appendChild(document.createElement("p"))
-        .appendChild(document.createTextNode("Station "+ segmentPathJSON[i].Name + " Segment Id " + segmentPathJSON[i].SegmentId))
+            .appendChild(document.createTextNode("Station " + segmentPathJSON[i].Name + " Segment Id " + segmentPathJSON[i].SegmentId))
     }
 
     // Get times.
-    console.log(nowTime.getTime(), user1.date.getTime());
+    console.log(nowTime + " lol " + user.time);
 
-    
+    let schedules = await (await fetch("http://10.101.0.12:8080/schedule/" + user.stationFrom)).json();
 
-    let schedules = "";
 
-    for (let i = 0; i < segmentPathJSON.length; i++) {
-        schedules += (await (await fetch("http://10.101.0.12:8080/schedule/" + segmentPathJSON[i].Name)).json())
-    }
+    console.log(schedules);
 
     // To extract the time from the JSON.
     // event.toLocaleTimeString('en-US').
 
 
-    console.log(schedules);
-
     // Creating an array to hold all schedule objects for stations.
 
-    
+
 
 
 }
