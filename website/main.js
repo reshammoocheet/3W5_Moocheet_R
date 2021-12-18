@@ -88,8 +88,10 @@ async function getPath() {
         station.forEach(function(time) {
             // time inside each station.
 
-            if (user.time.toISOString() > time.Time)
-                closestTimes.push(time.Time);           
+            // get next time only (closest/abs value) => online docu.
+                        
+            console.log(time);
+         
         })
     })
 
