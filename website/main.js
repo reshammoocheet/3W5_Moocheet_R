@@ -4,10 +4,12 @@ let nowTime = new Date(); // global variable for current time.
 document.getElementById("liveTime").innerHTML = nowTime.toLocaleDateString('default', { month: 'long' }) + " " + nowTime.getDate() + " " + nowTime.getHours() + ":" + nowTime.getMinutes();
 
 class User {
-    constructor(role, stationFrom, stationTo, time) {
+    constructor(role, stationFrom, stationTo, segmentId, finalSegmentId, time) {
         this.role = role;
         this.stationFrom = stationFrom;
         this.stationTo = stationTo;
+        this.segmentId = segmentId;
+        this.finalSegmentId = finalSegmentId;
         this.time = new Date(time);
     }
 }
@@ -25,6 +27,7 @@ function isValid(e) {
     let role = document.getElementById("role").value;
     let stationFrom = document.getElementById("stationsFrom").value;
     let stationTo = document.getElementById("stationsTo").value;
+
 
     // Converting the time string to create Date objects, making use of the class' functionalities.
     let time = new Date("1970-01-01 " + document.getElementById("time").value);
@@ -62,37 +65,67 @@ async function getPath() {
     let segmentPathJSON = await segmentPath.json();
     console.log(segmentPathJSON);
 
-    // Get schedules from user startpoint. This returns an array of ALL stops.
-    let schedulesObj = await (await fetch("http://10.101.0.12:8080/schedule/" + user.stationFrom)).json();
+    // Get segment ID value.
+    let segmentId = segmentPathJSON[0].SegmentId;   // Starting from...
 
-    // Get schedules that DEPART from start station only.
-    let departures = schedulesObj.filter(schedule => schedule.Direction == "Depart from " + user.stationFrom);
+    // How many segments? What are they? If there's more than one, it'll be two segments maximum (logistically).
+    let finalSegment = [];
+    for (let i = 0; i < segmentPathJSON.length; i++) {
+        if (segmentPathJSON[0].SegmentId != segmentPathJSON[i].SegmentId)
+            finalSegment.push(segmentPathJSON[i].Name, segmentPathJSON[i].SegmentId);
+    }
+
+    // Add to object.
+    user.finalSegmentId = finalSegment[1];
+
+    // Add to object.
+    user.segmentId = segmentId;
+
+    // Get schedules from user startpoint. This returns an array of ALL stops.
+    let schedulesDepart = await (await fetch("http://10.101.0.12:8080/schedule/" + user.stationFrom)).json();
+
+    // Get schedules from user connecting segment.
+    if (finalSegment.length != 0) {
+        console.log(finalSegment[0]);
+        let schedulesConnect = await (await fetch("http://10.101.0.12:8080/schedule/" + finalSegment[0])).json();
+
+        // Only consider times from second segment.
+        let connections = schedulesConnect.filter(schedule => schedule.SegmentId == finalSegment[1]);
+        console.log(connections);
+
+        // Same thing but with the second segment.
+        let connectSchedules = connections.map(({ Time }) => new Date(Time).toLocaleString('it-IT').split(',')[1]);
+        let goalTimeTwo; // calculate the time itll take after stops then loook up closest time.
+    }
+
+    console.log(user.segmentId);
+
+    // Only consider times from first segment.
+    let departures = schedulesDepart.filter(schedule => schedule.SegmentId == user.segmentId);
     console.log(departures);
 
     // We want the time values only, no objects just raw data inside an array. 
-    let schedules = departures.map(({ Time }) => new Date(Time).toLocaleString('it-IT').split(',')[1]);
+    let departSchedules = departures.map(({ Time }) => new Date(Time).toLocaleString('it-IT').split(',')[1]);
     let goalTime = user.time.toLocaleString('it-IT').split(',')[1];
 
     console.log("this is the goal minutes " + goalTime.split(':')[1]);
-    console.log("this is example of api schedules " + schedules + " which contains " + schedules.length + " elements");
+    console.log("this is example of api schedules " + departSchedules + " which contains " + departSchedules.length + " elements");
 
-    // Get closest value to user's selected time. 
+    // Get closest time to user's selected time. 
     let arrayMins = [];
     let theTime;
 
-    for (let i = 0; i < schedules.length; i++) {
-        if (schedules[i] === goalTime)
-            theTime = schedules[i];
+    for (let i = 0; i < departSchedules.length; i++) {
+        if (departSchedules[i] === goalTime)
+            theTime = departSchedules[i];
 
-        else if (schedules[i].split(':')[0] === goalTime.split(':')[0]) {
+        else if (departSchedules[i].split(':')[0] === goalTime.split(':')[0] && Number(departSchedules[i].split(':')[1]) >= Number(goalTime.split(':')[1])) {
+
             // Convert minutes format to Number so I can compare.
-
-            console.log(schedules[i]);
-
-            console.log(Number(schedules[i].split(':')[1]));
+            console.log(Number(departSchedules[i].split(':')[1]));
 
             // Adding to array.
-            arrayMins.push(Number(schedules[i].split(':')[1]));
+            arrayMins.push(Number(departSchedules[i].split(':')[1]));
 
             console.log(arrayMins);
 
@@ -100,14 +133,13 @@ async function getPath() {
             let goalMinutes = Number(goalTime.split(':')[1]);
             console.log(goalMinutes);
 
-            theTime = arrayMins.reduce(function (before, now) {
+            theTime = new Date("1970-01-01 " + user.time.getHours() + ":" + arrayMins.reduce(function (before, now) {
                 return Math.abs(now - goalMinutes) < Math.abs(before - goalMinutes) ? now : before;
-            });
-            console.log(theTime);
+            }));
+
+            console.log(theTime.toLocaleString('it-IT').split(',')[1]);
         }
     }
-
-    console.log("this is array " + arrayMins);
     console.log("this is the closest value : " + theTime);
 
     // Display station names from-to destination - so in-between locations.
@@ -125,13 +157,13 @@ async function getPath() {
         // *** To solve for time, t = d/s. ***
         let distance = await (await fetch("http://10.101.0.12:8080/distance/" + start + "/" + end)).json();
 
-        let time = distance / speed[0].AverageSpeed;
-        console.log(" this is how long from " + start + " to " + end + " : " + time * 60 + " minutes.");
+        let time = (distance / speed[0].AverageSpeed) * 60 * 60;
+        console.log(" this is how long from " + start + " to " + end + " : " + time + " seconds.");
 
     }
 
     // Appending text elements to display to user on screen. => Stations + Times.
-    for (let i = 0; i < segmentPathJSON.length - 1; i++) {
+    for (let i = 0; i <= segmentPathJSON.length - 1; i++) {
         document.getElementById("trip").appendChild(document.createElement("p"))
             .appendChild(document.createTextNode("Station " + segmentPathJSON[i].Name + " Segment Id " + segmentPathJSON[i].SegmentId));
     }
