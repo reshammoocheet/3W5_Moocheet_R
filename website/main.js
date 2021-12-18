@@ -1,5 +1,8 @@
 let nowTime = new Date(); // global variable for current time.
 
+// Let's display the date. Got the string from month thanks to online documentation.
+document.getElementById("liveTime").innerHTML = nowTime.toLocaleDateString('default', { month: 'long' }) + " " + nowTime.getDate() + " " + nowTime.getHours() + ":" + nowTime.getMinutes();
+
 class User {
     constructor(role, stationFrom, stationTo, time) {
         this.role = role;
@@ -32,7 +35,7 @@ function isValid(e) {
         time
     };
 
-    console.log(user.time);
+    console.log("this is the user time converted to " + user.time);
 
     // When are we rejecting?
     if (stationFrom == stationTo || user.time == "" || user.time.getHours() + user.time.getMinutes() < nowTime.getHours() + nowTime.getMinutes())
@@ -58,22 +61,43 @@ async function getPath() {
             .appendChild(document.createTextNode("Station " + segmentPathJSON[i].Name + " Segment Id " + segmentPathJSON[i].SegmentId))
     }
 
-    // Get times.
-    console.log(nowTime + " lol " + user.time);
-
-    let schedules = await (await fetch("http://10.101.0.12:8080/schedule/" + user.stationFrom)).json();
-
+    // Putting into an array multiple arrays of schedules (1 array for each station).
+    let schedules = [];
+    for (let i = 0; i < segmentPathJSON.length; i++) {
+        schedules.push(
+            await (await fetch("http://10.101.0.12:8080/schedule/" + segmentPathJSON[i].Name)).json()
+        )
+    }
 
     console.log(schedules);
 
-    // To extract the time from the JSON.
-    // event.toLocaleTimeString('en-US').
+
+    
+    // Get closest time to current. => Online documentation.
+    // Another schedules' array so it can only have the time values.
+
+    let goalISO = user.time.toISOString();
+    console.log(goalISO);
+
+    let closestTimes = [];
+
+    // schedules = [ [][][][][][][] ]
+
+    schedules.forEach(function(station) {
+        // each station is an array inside the array.
+        station.forEach(function(time) {
+            // time inside each station.
+            console.log(time.Time);
+            
+        })
+    })
 
 
-    // Creating an array to hold all schedule objects for stations.
+    let timeSchedules = [];
+    for (let i = 0; i < schedules.length; i++) {
 
-
-
+    }
+    //console.log(timeSchedules);
 
 }
 
