@@ -76,9 +76,9 @@ async function getPath() {
     // Get closest time to current. => Online documentation.
     // Another schedules' array so it can only have the time values.
 
-    let goalISO = user.time.toISOString();
-    console.log(goalISO);
-
+ 
+    console.log("this is the goal iso " + user.time.toISOString());
+    console.log("this is example of api iso " + schedules[0][0].Time);
     let closestTimes = [];
 
     // schedules = [ [][][][][][][] ]
@@ -87,11 +87,13 @@ async function getPath() {
         // each station is an array inside the array.
         station.forEach(function(time) {
             // time inside each station.
-            console.log(time.Time);
-            
+
+            if (user.time.toISOString() > time.Time)
+                closestTimes.push(time.Time);           
         })
     })
 
+    console.log(closestTimes);
 
     let timeSchedules = [];
     for (let i = 0; i < schedules.length; i++) {
