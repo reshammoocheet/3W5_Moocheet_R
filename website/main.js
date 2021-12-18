@@ -177,6 +177,11 @@ async function getPath() {
 
         document.getElementById("times").appendChild(document.createElement("p"))
             .appendChild(document.createTextNode(end + " at " + new Date(counter * 1000).toISOString().substr(11,8)));
+
+        if (user.segmentId != segmentPathJSON[i].SegmentId) {
+            console.log("hey! change segments bro");
+            break;
+        }
     }
 
     // Appending text elements to display to user on screen. => Stations + Times.
