@@ -8,7 +8,7 @@ class User {
         this.role = role;
         this.stationFrom = stationFrom;
         this.stationTo = stationTo;
-        this.time = time;
+        this.time = new Date(time);
     }
 }
 
@@ -22,10 +22,11 @@ function isValid(e) {
     e.preventDefault();
 
     // First, let's get the values.
+    let role = document.getElementById("role").value;
     let stationFrom = document.getElementById("stationsFrom").value;
     let stationTo = document.getElementById("stationsTo").value;
 
-    // Converting the time string to matching ones on schedules' API.
+    // Converting the time string to create Date objects, making use of the class' functionalities.
     let time = new Date("1970-01-01 " + document.getElementById("time").value);
 
     user = {
@@ -35,7 +36,7 @@ function isValid(e) {
         time
     };
 
-    console.log("this is the user time converted to " + user.time);
+    console.log("this is the user time converted to " + user.time.toLocaleString('it-IT').split(',')[1]);
 
     // When are we rejecting?
     if (stationFrom == stationTo || user.time == "" || user.time.getHours() + user.time.getMinutes() < nowTime.getHours() + nowTime.getMinutes())
@@ -48,6 +49,12 @@ function isValid(e) {
 
 }
 
+// Let's work with train speed. 
+async function getSpeed() {
+    let speed = await (await fetch("http://10.101.0.12:8080/averageTrainSpeed")).json();
+    console.log(speed[0].AverageSpeed + "km/h");
+}
+
 async function getPath() {
 
     // Get stops.
@@ -55,89 +62,77 @@ async function getPath() {
     let segmentPathJSON = await segmentPath.json();
     console.log(segmentPathJSON);
 
-    // Display station names from-to destination - so in-between locations.
-    for (let i = 0; i < segmentPathJSON.length; i++) {
-        document.getElementById("trip").appendChild(document.createElement("p"))
-            .appendChild(document.createTextNode("Station " + segmentPathJSON[i].Name + " Segment Id " + segmentPathJSON[i].SegmentId))
-    }
+    // Get schedules from user startpoint. This returns an array of ALL stops.
+    let schedulesObj = await (await fetch("http://10.101.0.12:8080/schedule/" + user.stationFrom)).json();
 
-    // Putting into an array multiple arrays of schedules (1 array for each station).
-    let schedules = [];
-    for (let i = 0; i < segmentPathJSON.length; i++) {
-        schedules.push(
-            await (await fetch("http://10.101.0.12:8080/schedule/" + segmentPathJSON[i].Name)).json()
-        )
-    }
+    // Get schedules that DEPART from start station only.
+    let departures = schedulesObj.filter(schedule => schedule.Direction == "Depart from " + user.stationFrom);
+    console.log(departures);
 
-    console.log(schedules);
+    // We want the time values only, no objects just raw data inside an array. 
+    let schedules = departures.map(({ Time }) => new Date(Time).toLocaleString('it-IT').split(',')[1]);
+    let goalTime = user.time.toLocaleString('it-IT').split(',')[1];
 
+    console.log("this is the goal minutes " + goalTime.split(':')[1]);
+    console.log("this is example of api schedules " + schedules + " which contains " + schedules.length + " elements");
 
-    
-    // Get closest time to current. => Online documentation.
-    // Another schedules' array so it can only have the time values.
+    // Get closest value to user's selected time. 
+    let arrayMins = [];
+    let theTime;
 
- 
-    console.log("this is the goal iso " + user.time.toISOString());
-    console.log("this is example of api iso " + schedules[0][0].Time);
-    let closestTimes = [];
-
-    // schedules = [ [][][][][][][] ]
-
-    schedules.forEach(function(station) {
-        // each station is an array inside the array.
-        station.forEach(function(time) {
-            // time inside each station.
-
-            // get next time only (closest/abs value) => online docu.
-                        
-            console.log(time);
-         
-        })
-    })
-
-    console.log(closestTimes);
-
-    let timeSchedules = [];
     for (let i = 0; i < schedules.length; i++) {
+        if (schedules[i] === goalTime)
+            theTime = schedules[i];
+
+        else if (schedules[i].split(':')[0] === goalTime.split(':')[0]) {
+            // Convert minutes format to Number so I can compare.
+
+            console.log(schedules[i]);
+
+            console.log(Number(schedules[i].split(':')[1]));
+
+            // Adding to array.
+            arrayMins.push(Number(schedules[i].split(':')[1]));
+
+            console.log(arrayMins);
+
+            // Find closest minutes value. I'm using the reduce method, learned from class but I also looked it up on online documentation.
+            let goalMinutes = Number(goalTime.split(':')[1]);
+            console.log(goalMinutes);
+
+            theTime = arrayMins.reduce(function (before, now) {
+                return Math.abs(now - goalMinutes) < Math.abs(before - goalMinutes) ? now : before;
+            });
+            console.log(theTime);
+        }
+    }
+
+    console.log("this is array " + arrayMins);
+    console.log("this is the closest value : " + theTime);
+
+    // Display station names from-to destination - so in-between locations.
+    // Get distances, speed and time.
+    for (let i = 0; i < segmentPathJSON.length - 1; i++) {
+
+        // Get distance between stations.
+        let start = await segmentPathJSON[i].Name;
+
+        let end = segmentPathJSON[i + 1].Name;
+
+        // Speed value.
+        let speed = await (await fetch("http://10.101.0.12:8080/averageTrainSpeed")).json();
+
+        // *** To solve for time, t = d/s. ***
+        let distance = await (await fetch("http://10.101.0.12:8080/distance/" + start + "/" + end)).json();
+
+        let time = distance / speed[0].AverageSpeed;
+        console.log(" this is how long from " + start + " to " + end + " : " + time * 60 + " minutes.");
 
     }
-    //console.log(timeSchedules);
 
-}
-
-
-// Get values from user input.
-let role = document.getElementById("role");
-role.addEventListener("change", setRole);
-
-// Setting role.
-function setRole() {
-
-}
-
-let start = document.getElementById("stationsFrom");
-start.addEventListener("change", setStart);
-
-// Setting start location.
-function setStart() {
-
-}
-
-let destination = document.getElementById("stationsTo");
-destination.addEventListener("change", setDestination);
-
-// Setting destination location.
-function setDestination() {
-
-}
-async function tripStations() {
-    console.log("yay!");
-    let response = await fetch("http://10.101.0.12:8080/stations" + "/10");
-    responseJSON = response.json();
-    document.getElementById("trip").innerHTML = responseJSON;
-}
-
-
-function preventDefault() {
-    console.log("u suck");
+    // Appending text elements to display to user on screen. => Stations + Times.
+    for (let i = 0; i < segmentPathJSON.length - 1; i++) {
+        document.getElementById("trip").appendChild(document.createElement("p"))
+            .appendChild(document.createTextNode("Station " + segmentPathJSON[i].Name + " Segment Id " + segmentPathJSON[i].SegmentId));
+    }
 }
