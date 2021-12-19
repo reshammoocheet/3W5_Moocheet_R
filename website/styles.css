@@ -30,6 +30,10 @@ li {
     flex: 1;
 }
 
+#stops :hover {
+    cursor: pointer;
+}
+
 #times {
     flex : 1;
     padding-left: 2em;

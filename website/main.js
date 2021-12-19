@@ -123,7 +123,7 @@ async function getPath() {
     let startSeconds;
 
     for (let i = 0; i < departSchedules.length; i++) {
-        if (departSchedules[i] === goalTime)
+        if (departSchedules[i].split(':')[0][1] === goalTime)
             theTime = departSchedules[i];
 
         else if (departSchedules[i].split(':')[0] === goalTime.split(':')[0] && Number(departSchedules[i].split(':')[1]) >= Number(goalTime.split(':')[1])) {
@@ -189,8 +189,37 @@ async function getPath() {
 
     for (let i = 1; i < segmentPathJSON.length; i++) {
         document.getElementById("stops").appendChild(document.createElement("li"))
-            .appendChild(document.createTextNode("Station " + segmentPathJSON[i].Name + " Segment Id " + segmentPathJSON[i].SegmentId));
+            .appendChild(document.createTextNode(segmentPathJSON[i].Name + ": Segment Id " + segmentPathJSON[i].SegmentId));
+
+        // Making elements clickable - the list ones. Took this from my SpaceX assignment.
+        document.getElementById("stops").addEventListener("click", function (e) {
+            console.log(e.target.innerHTML.split(':')[0]);
+            if (e.target.innerHTML.split(':')[0] == segmentPathJSON[i].Name) {
+                // name of function that we're calling.
+                getInfo(segmentPathJSON[i].StationId);
+            }
+        })
     }
+}
+async function getInfo(id) {
+    console.log("hi! " + id);
+    let information = await (await fetch("http://10.101.0.12:8080/stations/" + id)).json();
 
+    console.log(document.getElementById("stops").getElementsByTagName("li").length);
+    for (let i = 0; i < document.getElementById("stops").getElementsByTagName("li").length; i++) {
 
+        console.log(information[0].Name);
+        let stops = document.getElementById("stops");
+
+        console.log(stops.getElementsByTagName("li")[0].innerHTML);
+
+        if (stops.getElementsByTagName("li")[i].innerHTML.split(':')[0] == information[0].Name) {
+            console.log("match !" + stops.getElementsByTagName("li")[i].innerHTML.split(':')[0] + " and " + information[0].Name);
+            stops.getElementsByTagName("li")[i].appendChild(document.createElement("p"))
+                .appendChild(document.createTextNode(information[0].BicycleAvailability ? information[0].StreetName + " street and there is bicycle availability." : information[0].StreetName + " street and there is no bicycle availability."));
+        }
+        else {
+            continue;
+        }
+    }
 }
