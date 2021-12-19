@@ -238,7 +238,9 @@ async function getInfo(id) {
                 let j = 0;
                 let text = notification[0].Name + " - " + notification[0].Description;
 
-                function animateText() {
+                // Changing color.
+                stops.getElementsByTagName("p")[1].style.color = 'red';
+                async function animateText() {
                     if (j < text.length) {
                         stops.getElementsByTagName("p")[1].innerHTML += text.charAt(j);
                         j++;
