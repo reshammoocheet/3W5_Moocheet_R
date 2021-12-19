@@ -71,13 +71,14 @@ li {
     font-size: 18px;
 }
 
+#timeStops li {
+    border-style: none;
+    list-style: circle;
+}
+
 li:hover {
     color: #deb880;
     box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
-}
-
-#timeStops {
-    list-style: none;
 }
 
 #container {

@@ -176,7 +176,7 @@ async function getPath() {
 
 
         document.getElementById("timeStops").appendChild(document.createElement("li"))
-            .appendChild(document.createTextNode("-- " + end + " at " + new Date(counter * 1000).toISOString().substr(11, 8)));
+            .appendChild(document.createTextNode(end + " at " + new Date(counter * 1000).toISOString().substr(11, 8)));
 
         if (user.segmentId != segmentPathJSON[i].SegmentId) {
             console.log("hey! change segments bro");
