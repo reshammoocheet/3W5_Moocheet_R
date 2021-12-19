@@ -175,8 +175,8 @@ async function getPath() {
         console.log("counter is " + Math.round(counter));
 
 
-        document.getElementById("times").appendChild(document.createElement("p"))
-            .appendChild(document.createTextNode(end + " at " + new Date(counter * 1000).toISOString().substr(11, 8)));
+        document.getElementById("timeStops").appendChild(document.createElement("li"))
+            .appendChild(document.createTextNode("-- " + end + " at " + new Date(counter * 1000).toISOString().substr(11, 8)));
 
         if (user.segmentId != segmentPathJSON[i].SegmentId) {
             console.log("hey! change segments bro");
@@ -185,10 +185,10 @@ async function getPath() {
     }
 
     // Appending text elements to display to user on screen. => Stations + Times.
-    document.getElementById("trip").appendChild(document.createElement("p")).appendChild(document.createTextNode("Starting at " + theTime.toLocaleString('it-IT') + " " + user.stationFrom));
+    document.getElementById("trip").appendChild(document.createElement("p")).appendChild(document.createTextNode("Starting at " + theTime.toLocaleString('it-IT').split(',')[1] + " " + user.stationFrom));
 
     for (let i = 1; i < segmentPathJSON.length; i++) {
-        document.getElementById("trip").appendChild(document.createElement("p"))
+        document.getElementById("stops").appendChild(document.createElement("li"))
             .appendChild(document.createTextNode("Station " + segmentPathJSON[i].Name + " Segment Id " + segmentPathJSON[i].SegmentId));
     }
 
