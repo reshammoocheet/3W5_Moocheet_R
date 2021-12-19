@@ -1,7 +1,7 @@
 let nowTime = new Date(); // global variable for current time.
 
 // Let's display the date. Got the string from month thanks to online documentation.
-document.getElementById("liveTime").innerHTML = nowTime;
+document.getElementById("liveTime").innerHTML = "LIVE TIME -" + nowTime.toLocaleString('it-IT').split(',')[1].substring(0, 6);
 
 class User {
     constructor(role, stationFrom, stationTo, segmentId, finalSegmentId, time) {
