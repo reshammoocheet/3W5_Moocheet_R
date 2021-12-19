@@ -202,14 +202,22 @@ async function getPath() {
     }
 }
 async function getInfo(id) {
-    console.log("hi! " + id);
+    // We are getting station information AND notifications (if there are any).
+    // Fetching station information.
     let information = await (await fetch("http://10.101.0.12:8080/stations/" + id)).json();
+
+    // Fetching station notification.
+    let notification = await (await fetch("http://10.101.0.12:8080/notifications/" + id)).json();
+
+    let stops = document.getElementById("stops");
+
+
+    console.log("empty");
 
     console.log(document.getElementById("stops").getElementsByTagName("li").length);
     for (let i = 0; i < document.getElementById("stops").getElementsByTagName("li").length; i++) {
 
         console.log(information[0].Name);
-        let stops = document.getElementById("stops");
 
         console.log(stops.getElementsByTagName("li")[0].innerHTML);
 
@@ -217,6 +225,13 @@ async function getInfo(id) {
             console.log("match !" + stops.getElementsByTagName("li")[i].innerHTML.split(':')[0] + " and " + information[0].Name);
             stops.getElementsByTagName("li")[i].appendChild(document.createElement("p"))
                 .appendChild(document.createTextNode(information[0].BicycleAvailability ? information[0].StreetName + " street and there is bicycle availability." : information[0].StreetName + " street and there is no bicycle availability."));
+
+            // If the array is empty, nothing is displayed.
+            if (notification.length != 0) {
+                stops.getElementsByTagName("li")[i].lastChild.appendChild(document.createElement("p"))
+                .appendChild(document.createTextNode(notification[0].Name + " - " + notification[0].Description));
+            }
+
         }
     }
 }
