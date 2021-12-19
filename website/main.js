@@ -18,7 +18,9 @@ class User {
 let user = new User();
 
 const form = document.getElementById("theForm");
-form.addEventListener("submit", isValid);
+
+// Making click event happen once only.
+form.addEventListener("submit", isValid, { once: true });
 
 function isValid(e) {
     e.preventDefault();
@@ -39,10 +41,11 @@ function isValid(e) {
         time
     };
 
+
     console.log("this is the user time converted to " + user.time.toLocaleString('it-IT').split(',')[1]);
 
     // When are we rejecting?
-    if (stationFrom == stationTo || user.time == "" || user.time.getHours() + user.time.getMinutes() < nowTime.getHours() + nowTime.getMinutes())
+    if (stationFrom == stationTo || user.time == "" || user.time.getHours() == nowTime.getHours() && user.time.getMinutes() < nowTime.getMinutes())
         alert("Error.");
 
     else {
@@ -176,7 +179,7 @@ async function getPath() {
 
 
         document.getElementById("timeStops").appendChild(document.createElement("li"))
-            .appendChild(document.createTextNode(end + " at " + new Date(counter * 1000).toISOString().substr(11, 8)));
+            .appendChild(document.createTextNode(end + " at " + new Date(counter * 1000).toISOString().substring(11, 19)));
 
         if (user.segmentId != segmentPathJSON[i].SegmentId) {
             console.log("hey! change segments bro");
@@ -198,7 +201,7 @@ async function getPath() {
                 // name of function that we're calling.
                 getInfo(segmentPathJSON[i].StationId);
             }
-        })
+        });
     }
 }
 async function getInfo(id) {
@@ -229,9 +232,26 @@ async function getInfo(id) {
             // If the array is empty, nothing is displayed.
             if (notification.length != 0) {
                 stops.getElementsByTagName("li")[i].lastChild.appendChild(document.createElement("p"))
-                .appendChild(document.createTextNode(notification[0].Name + " - " + notification[0].Description));
+                    .appendChild(document.createTextNode(""));
+
+                // Using w3schools online documentation to animate text.
+                let j = 0;
+                let text = notification[0].Name + " - " + notification[0].Description;
+
+                function animateText() {
+                    if (j < text.length) {
+                        stops.getElementsByTagName("p")[1].innerHTML += text.charAt(j);
+                        j++;
+                        setTimeout(animateText, 55);
+                    }
+                }
+
+                // Calling the animate function.
+                animateText();
+
             }
 
         }
     }
 }
+

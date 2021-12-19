@@ -34,7 +34,6 @@ select:hover {
 input {
     border-radius: 0.5em;
     padding: 0.5em;
-    border-width: 0.2em;
     transition-duration: 0.5s;
 }
 
