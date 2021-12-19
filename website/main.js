@@ -218,8 +218,5 @@ async function getInfo(id) {
             stops.getElementsByTagName("li")[i].appendChild(document.createElement("p"))
                 .appendChild(document.createTextNode(information[0].BicycleAvailability ? information[0].StreetName + " street and there is bicycle availability." : information[0].StreetName + " street and there is no bicycle availability."));
         }
-        else {
-            continue;
-        }
     }
 }
