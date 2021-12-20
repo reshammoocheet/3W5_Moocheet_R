@@ -16,6 +16,10 @@ body {
     border-radius: 0.6em;
 }
 
+li {
+    text-align: left;
+}
+
 #news {
     width: 50%;
     text-align: justify;
