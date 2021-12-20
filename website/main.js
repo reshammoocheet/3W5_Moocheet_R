@@ -55,12 +55,6 @@ function isValid(e) {
 
 }
 
-// Let's work with train speed. 
-async function getSpeed() {
-    let speed = await (await fetch("http://10.101.0.12:8080/averageTrainSpeed")).json();
-    console.log(speed[0].AverageSpeed + "km/h");
-}
-
 async function getPath() {
 
     // Get stops.
@@ -150,6 +144,13 @@ async function getPath() {
             // Convert start point time to seconds.
             timeString = theTime.toLocaleString('it-IT').split(',')[1].split(':');
             startSeconds = Number(timeString[0] * 60 * 60) + Number(timeString[1] * 60) + Number(timeString[2]);
+        }
+        else {
+            if (confirm("SORRY! There's no trains at this time. Please select an earlier time.")) {
+                location.reload();
+                break;
+            }
+            
         }
     }
     console.log("this is the closest value : " + theTime);
