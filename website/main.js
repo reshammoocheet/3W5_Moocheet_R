@@ -7,7 +7,7 @@ document.getElementById("liveTime").innerHTML = nowTime.toString().split('G')[0]
 // Credit to inshortsapi.vercel.app.
 async function getNews() {
     let data = await (await fetch("https://inshortsapi.vercel.app/news?category=world")).json();
-    document.getElementById("news").getElementsByTagName("p")[1] = data.data[0].content;
+    document.getElementById("news").getElementsByTagName("p")[1].innerHTML = data.data[0].content + " Written by: " + data.data[0].author;
 }
 
 getNews();
@@ -224,10 +224,6 @@ async function getInfo(id) {
 
     let stops = document.getElementById("stops");
 
-
-    console.log("empty");
-
-    console.log(document.getElementById("stops").getElementsByTagName("li").length);
     for (let i = 0; i < document.getElementById("stops").getElementsByTagName("li").length; i++) {
 
         console.log(information[0].Name);
