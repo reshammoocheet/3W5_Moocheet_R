@@ -130,7 +130,7 @@ async function getPath() {
 
     for (let i = 0; i < departSchedules.length; i++) {
         console.log(" LOL " + departSchedules[i].split(':'));
-        if (departSchedules[i].split(':')[0] +departSchedules[i].split(':')[1] === goalTime)
+        if (departSchedules[i].split(':')[0] + departSchedules[i].split(':')[1] === goalTime)
             theTime = departSchedules[i];
 
         else if (departSchedules[i].split(':')[0] === goalTime.split(':')[0] && Number(departSchedules[i].split(':')[1]) >= Number(goalTime.split(':')[1])) {
@@ -181,6 +181,8 @@ async function getPath() {
         counter += time;
         console.log("counter is " + Math.round(counter));
 
+        if (start == end)
+            continue;
 
         document.getElementById("timeStops").appendChild(document.createElement("li"))
             .appendChild(document.createTextNode(end + " at " + new Date(counter * 1000).toISOString().substring(11, 19)));
@@ -195,6 +197,10 @@ async function getPath() {
     document.getElementById("starting").innerHTML = "Starting at " + theTime.toLocaleString('it-IT').split(',')[1] + " " + user.stationFrom;
 
     for (let i = 1; i < segmentPathJSON.length; i++) {
+        if (segmentPathJSON[i].Name == segmentPathJSON[i - 1].Name) {
+            continue;
+        }
+
         document.getElementById("stops").appendChild(document.createElement("li"))
             .appendChild(document.createTextNode(segmentPathJSON[i].Name + ": Segment Id " + segmentPathJSON[i].SegmentId));
 
@@ -244,7 +250,7 @@ async function getInfo(id) {
 
                 // Changing color.
                 stops.getElementsByTagName("p")[1].style.color = 'red';
-                async function animateText() {
+                function animateText() {
                     if (j < text.length) {
                         stops.getElementsByTagName("p")[1].innerHTML += text.charAt(j);
                         j++;
