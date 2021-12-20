@@ -40,7 +40,6 @@ function isValid(e) {
     let stationFrom = document.getElementById("stationsFrom").value;
     let stationTo = document.getElementById("stationsTo").value;
 
-
     // Converting the time string to create Date objects, making use of the class' functionalities.
     let time = new Date("1970-01-01 " + document.getElementById("time").value);
 
@@ -51,6 +50,7 @@ function isValid(e) {
         time
     };
 
+    let date = document.getElementById("date").value;
 
     console.log("this is the user time converted to " + user.time.toLocaleString('it-IT').split(',')[1]);
 
