@@ -1,7 +1,16 @@
 let nowTime = new Date(); // global variable for current time.
 
 // Let's display the date. Got the string from month thanks to online documentation.
-document.getElementById("liveTime").innerHTML = "LIVE TIME -" + nowTime.toLocaleString('it-IT').split(',')[1].substring(0, 6);
+document.getElementById("liveTime").innerHTML = nowTime.toString().split('G')[0];
+
+// External APIs. First one I'm using is worldwide data.
+// Credit to inshortsapi.vercel.app.
+async function getNews() {
+    let data = await (await fetch("https://inshortsapi.vercel.app/news?category=world")).json();
+    document.getElementById("news").getElementsByTagName("p")[1] = data.data[0].content;
+}
+
+getNews();
 
 class User {
     constructor(role, stationFrom, stationTo, segmentId, finalSegmentId, time) {
@@ -120,7 +129,8 @@ async function getPath() {
     let startSeconds;
 
     for (let i = 0; i < departSchedules.length; i++) {
-        if (departSchedules[i].split(':')[0][1] === goalTime)
+        console.log(" LOL " + departSchedules[i].split(':'));
+        if (departSchedules[i].split(':')[0] +departSchedules[i].split(':')[1] === goalTime)
             theTime = departSchedules[i];
 
         else if (departSchedules[i].split(':')[0] === goalTime.split(':')[0] && Number(departSchedules[i].split(':')[1]) >= Number(goalTime.split(':')[1])) {
@@ -144,13 +154,6 @@ async function getPath() {
             // Convert start point time to seconds.
             timeString = theTime.toLocaleString('it-IT').split(',')[1].split(':');
             startSeconds = Number(timeString[0] * 60 * 60) + Number(timeString[1] * 60) + Number(timeString[2]);
-        }
-        else {
-            if (confirm("SORRY! There's no trains at this time. Please select an earlier time.")) {
-                location.reload();
-                break;
-            }
-            
         }
     }
     console.log("this is the closest value : " + theTime);
@@ -189,7 +192,7 @@ async function getPath() {
     }
 
     // Appending text elements to display to user on screen. => Stations + Times.
-    document.getElementById("trip").appendChild(document.createElement("p")).appendChild(document.createTextNode("Starting at " + theTime.toLocaleString('it-IT').split(',')[1] + " " + user.stationFrom));
+    document.getElementById("starting").innerHTML = "Starting at " + theTime.toLocaleString('it-IT').split(',')[1] + " " + user.stationFrom;
 
     for (let i = 1; i < segmentPathJSON.length; i++) {
         document.getElementById("stops").appendChild(document.createElement("li"))

@@ -23,6 +23,7 @@ select {
     border-style: none;
     transition-duration: 0.3s;
     border-radius: 0.5em;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
 
 select:hover {
@@ -35,6 +36,7 @@ input {
     border-radius: 0.5em;
     padding: 0.5em;
     transition-duration: 0.5s;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
 
 input:hover {
@@ -49,6 +51,7 @@ button {
     background-color: white;
     border-radius: 0.5em;
     border-style: none;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
 
 /* My customization is inspired by w3schools */
