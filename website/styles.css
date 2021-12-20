@@ -3,6 +3,23 @@
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+body {
+    padding: 0.5em;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+}
+
+#news {
+    width: 50%;
+    text-align: justify;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    padding: 1.5em;
+    border-radius: 0.6em;
+}
+
 li p {
     font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
     font-size: smaller;

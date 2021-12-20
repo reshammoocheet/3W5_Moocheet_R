@@ -7,7 +7,8 @@ document.getElementById("liveTime").innerHTML = nowTime.toString().split('G')[0]
 // Credit to inshortsapi.vercel.app.
 async function getNews() {
     let data = await (await fetch("https://inshortsapi.vercel.app/news?category=world")).json();
-    document.getElementById("news").getElementsByTagName("p")[1].innerHTML = data.data[0].content + " Written by: " + data.data[0].author;
+    document.getElementById("news").getElementsByTagName("p")[1].innerHTML = data.data[0].content
+    + "<br></br>Written by: " + data.data[0].author + ". Date: " + data.data[0].date.split(',')[0];
 }
 
 getNews();
