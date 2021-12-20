@@ -51,11 +51,13 @@ function isValid(e) {
     };
 
     let date = document.getElementById("date").value;
+    console.log(date);
+    console.log(nowTime.toISOString().split('T')[0]);
 
     console.log("this is the user time converted to " + user.time.toLocaleString('it-IT').split(',')[1]);
 
     // When are we rejecting?
-    if (stationFrom == stationTo || user.time == "" || user.time.getHours() == nowTime.getHours() && user.time.getMinutes() < nowTime.getMinutes())
+    if (stationFrom == stationTo || user.time == "" || date < nowTime.toISOString().split('T')[0] || date == nowTime.toISOString().split('T')[0] && user.time.getHours() < nowTime.getHours() || date == nowTime.toISOString().split('T')[0] && user.time.getHours() == nowTime.getHours() && user.time.getMinutes() < nowTime.getMinutes())
         alert("Error.");
 
     else {
