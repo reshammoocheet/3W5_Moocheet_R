@@ -237,7 +237,7 @@ async function getPath() {
 
     // Appending text elements to display to user on screen. => Stations + Times.
     document.getElementById("starting").innerHTML = "<strong>Starting at " + timeString[0] + ":" + timeString[1] + ":" + timeString[2] + " " + user.stationFrom + "</strong>"
-    + "<br></br><em>Click on station for more information. Please watch out for indicated notifications.</em>";
+        + "<br></br><em>Click on station for more information. Please watch out for indicated notifications.</em>";
 
     let counter = startSeconds;
     for (let i = 0; i < segmentPathJSON.length - 1; i++) {
@@ -344,7 +344,7 @@ async function getPath() {
             }
 
             document.getElementById("timeStops").getElementsByTagName("li")[i - 1]
-                .appendChild(document.createTextNode(" Next Departure at " + new Date(secondStartSeconds * 1000).toISOString().substring(11, 19)));
+                .appendChild(document.createTextNode(" ⭐ LEAVING AT " + new Date(secondStartSeconds * 1000).toISOString().substring(11, 19)));
 
             // Removing duplicate elements (segment switch) in list of stops and times.
             document.getElementById("timeStops").removeChild(document.getElementById("timeStops").getElementsByTagName("li")[i]);
@@ -388,11 +388,13 @@ async function getPath() {
 
         // Making elements clickable - the list ones. Took this from my SpaceX assignment.
         document.getElementById("stops").addEventListener("click", function (e) {
+            e.preventDefault();
             console.log(e.target.innerHTML.split(':')[0]);
             if (e.target.innerHTML.split(':')[0] == segmentPathJSON[i].Name) {
                 // name of function that we're calling.
-                getInfo(segmentPathJSON[i].StationId);
+                getInfo(segmentPathJSON[i].StationId, e);
             }
+        
         });
     }
 }
@@ -436,13 +438,13 @@ async function getInfo(id) {
                         setTimeout(animateText, 55);
                     }
                 }
+                document.getElementById("stops").getElementsByTagName("li")[i].disabled = true;
 
                 // Calling the animate function.
                 animateText();
-
-            }
-
-        }
+                
+            }             
     }
+    
 }
-
+}
