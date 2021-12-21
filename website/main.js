@@ -9,7 +9,7 @@ document.getElementById("liveTime").style.boxShadow = '1px 2px 0 rgba(0,0,0,0.24
 async function getNews() {
     let data = await (await fetch("https://inshortsapi.vercel.app/news?category=world")).json();
     document.getElementById("news").getElementsByTagName("p")[1].innerHTML = data.data[0].content
-        + "<br></br>Written by: " + data.data[0].author + ". Date: " + data.data[0].date.split(',')[0];
+        + "<br></br><em>Author: " + data.data[0].author + ". Date: " + data.data[0].date.split(',')[0] + "</em>";
 }
 
 getNews();
@@ -238,7 +238,7 @@ async function getPath() {
 
     // Appending text elements to display to user on screen. => Stations + Times.
     document.getElementById("starting").innerHTML = "<strong>Starting at " + timeString[0] + ":" + timeString[1] + ":" + timeString[2] + " " + user.stationFrom + "</strong>"
-        + "<br></br><em>Click on station for more information. Please watch out for indicated notifications.";
+        + "<br></br><em>Click on station for more information. Please watch out for indicated notifications.</em>";
 
     let counter = startSeconds;
     for (let i = 0; i < segmentPathJSON.length - 1; i++) {
@@ -393,7 +393,7 @@ async function getPath() {
             console.log(e.target.innerHTML.split(':')[0]);
             if (e.target.innerHTML.split(':')[0] == segmentPathJSON[i].Name) {
                 // name of function that we're calling.
-                getInfo(segmentPathJSON[i].StationId, e);
+                getInfo(segmentPathJSON[i].StationId);
             }
         
         });
@@ -409,9 +409,9 @@ async function getInfo(id) {
     let notification = await (await fetch("http://10.101.0.12:8080/notifications/" + id)).json();
 
     let stops = document.getElementById("stops");
-
-    for (let i = 0; i < document.getElementById("stops").getElementsByTagName("li").length; i++) {
-
+    
+    for (let i = 0; i < stops.getElementsByTagName("li").length; i++) {
+        stops.getElementsByTagName("li")[i].disabled = true;
         console.log(information[0].Name);
 
         console.log(stops.getElementsByTagName("li")[0].innerHTML);
@@ -428,7 +428,7 @@ async function getInfo(id) {
 
                 // Using w3schools online documentation to animate text.
                 let j = 0;
-                let text = notification[0].Name + " - " + notification[0].Description;
+                let text = "☝️ "+ notification[0].Name + " - " + notification[0].Description;
 
                 // Changing color.
                 text.fontcolor('red');
@@ -439,12 +439,13 @@ async function getInfo(id) {
                         setTimeout(animateText, 55);
                     }
                 }
-                document.getElementById("stops").getElementsByTagName("li")[i].disabled = true;
+                
 
                 // Calling the animate function.
                 animateText();
                 
-            }             
+            }    
+                     
     }
     
 }
