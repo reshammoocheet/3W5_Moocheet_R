@@ -1,7 +1,8 @@
 let nowTime = new Date(); // global variable for current time.
 
 // Let's display the date. Got the string from month thanks to online documentation.
-document.getElementById("liveTime").innerHTML = nowTime.toString().split('G')[0];
+document.getElementById("liveTime").innerHTML = nowTime.toLocaleDateString();
+document.getElementById("liveTime").style.boxShadow = '1px 2px 0 rgba(0,0,0,0.24), 0 4px 4px 0 rgba(0,0,0,0.19)';
 
 // External APIs. First one I'm using is worldwide data.
 // Credit to inshortsapi.vercel.app.
@@ -237,7 +238,7 @@ async function getPath() {
 
     // Appending text elements to display to user on screen. => Stations + Times.
     document.getElementById("starting").innerHTML = "<strong>Starting at " + timeString[0] + ":" + timeString[1] + ":" + timeString[2] + " " + user.stationFrom + "</strong>"
-        + "<br></br><em>Click on station for more information. Please watch out for indicated notifications.</em>";
+        + "<br></br><em>Click on station for more information. Please watch out for indicated notifications.";
 
     let counter = startSeconds;
     for (let i = 0; i < segmentPathJSON.length - 1; i++) {
