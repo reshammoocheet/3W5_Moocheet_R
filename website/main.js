@@ -55,7 +55,7 @@ function isValid(e) {
     console.log(nowTime.toISOString().split('T')[0]);
 
     console.log("this is the user time converted to " + user.time.toLocaleString('it-IT').split(',')[1]);
-
+    console.log("This is ");
     // When are we rejecting?
     if (stationFrom == stationTo || user.time == "" || date < nowTime.toISOString().split('T')[0] || date == nowTime.toISOString().split('T')[0] && user.time.getHours() < nowTime.getHours() || date == nowTime.toISOString().split('T')[0] && user.time.getHours() == nowTime.getHours() && user.time.getMinutes() < nowTime.getMinutes())
         alert("Error.");
@@ -64,7 +64,6 @@ function isValid(e) {
         getPath();
         // Resetting form. => how?   
     }
-
 }
 
 async function getPath() {
@@ -124,9 +123,6 @@ async function getPath() {
     let arrayMins = [];
     let theTime;
 
-    // Array for estimated times (calculated thanks to speed and such).
-    let arraySecs = [];
-
     // Initialization.
     let timeString;
     let startSeconds;
@@ -138,6 +134,7 @@ async function getPath() {
 
         else if (departSchedules[i].split(':')[0] === goalTime.split(':')[0] && Number(departSchedules[i].split(':')[1]) >= Number(goalTime.split(':')[1])) {
 
+            console.log("second if.");
             // Convert minutes format to Number so I can compare.
             console.log(Number(departSchedules[i].split(':')[1]));
 
@@ -158,6 +155,10 @@ async function getPath() {
             timeString = theTime.toLocaleString('it-IT').split(',')[1].split(':');
             startSeconds = Number(timeString[0] * 60 * 60) + Number(timeString[1] * 60) + Number(timeString[2]);
         }
+        else {
+            console.log("This is " + Number(departSchedules[i].split(':')[0]) + " second split " +Number(departSchedules[i].split(':')[1]) + " and " + Number(goalTime.split(':')[0]));
+        }
+            
     }
     console.log("this is the closest value : " + theTime);
     console.log(startSeconds);
