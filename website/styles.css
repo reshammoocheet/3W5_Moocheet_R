@@ -129,3 +129,17 @@ li:hover {
     margin-left: 10px;
 }
 
+/* Zooming effect on image - inspo taken from w3Schools online documentation. */
+img {
+     width: 50%;
+     height: 50%;
+     box-shadow: 0 1px 3px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+     border-radius: 0.6em;
+     transition: transform .2s;
+ }
+
+ img:hover {
+     -ms-transform: scale(1.5);
+     transform: scale(1.5);
+ }
+
