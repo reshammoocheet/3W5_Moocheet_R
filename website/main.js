@@ -221,11 +221,11 @@ async function getPath() {
 
                     // Adding to array.
                     for (let i = 0; i < connectSchedules.length; i++) {
-                        if (connectSchedules[i].split(':')[1] > secondGoalTime.split(':')[1])   // Realistically, let's give the user a minute before next departure.
+                        if (connectSchedules[i].split(':')[1] > secondGoalTime.split(':')[1])   
                             secondArrayMins.push(Number(connectSchedules[i].split(':')[1]));
                     }
 
-                    let secondGoalMinutes = Number(secondGoalTime.split(':')[1]) + 1;
+                    let secondGoalMinutes = Number(secondGoalTime.split(':')[1]) + 1;   // Realistically, let's give the user a minute before next departure.
 
                     console.log(secondArrayMins);
 
@@ -244,8 +244,34 @@ async function getPath() {
                     console.log(secondTimeString);
                     console.log(secondStartSeconds);
                 }
-                else
-                    console.log("this is " + connectSchedules[i] + " and " + secondGoalTime);
+                else if (Number(connectSchedules[i].split(':')[0]) != Number(secondGoalTime.split(':')[0])) {
+                    // This is in case it's like 12:57, we go to the next hour and repeat the same process of finding the closest minute.
+                    // Adding to array.
+                    for (let i = 0; i < connectSchedules.length; i++) {
+                        if (connectSchedules[i].split(':')[1] > secondGoalTime.split(':')[1])   
+                            secondArrayMins.push(Number(connectSchedules[i].split(':')[1]));
+                    }
+                    let secondGoalMinutes = Number(secondGoalTime.split(':')[1]) + 1;   // Realistically, let's give the user a minute before next departure.
+
+                    console.log(secondArrayMins);
+
+                    secondTime = new Date("1970-01-01 " + (user.time.getHours() + 1) + ":" + secondArrayMins.reduce(function (before, now) {
+                        return Math.abs(now - secondGoalMinutes) < Math.abs(before - secondGoalMinutes) ? now : before;
+                    }));
+
+                    console.log(secondGoalMinutes);
+
+                    console.log(secondTime);
+
+                    // Convert start point time to seconds.
+                    secondTimeString = secondTime.toLocaleString('it-IT').split(',')[1].split(':');
+                    secondStartSeconds = Number(secondTimeString[0] * 60 * 60) + Number(secondTimeString[1] * 60) + Number(secondTimeString[2]);
+
+                    console.log(secondTimeString);
+                    console.log(secondStartSeconds);
+
+                }
+                console.log("this is " + connectSchedules[i] + " and " + secondGoalTime);
 
             }
 
@@ -254,7 +280,7 @@ async function getPath() {
 
             // Removing duplicate elements (segment switch) in list of stops and times.
             document.getElementById("timeStops").removeChild(document.getElementById("timeStops").getElementsByTagName("li")[i]);
-            
+
 
             let secondCounter = secondStartSeconds;
             for (let j = i; j < segmentPathJSON.length - 1; j++) {
