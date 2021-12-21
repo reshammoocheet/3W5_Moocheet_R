@@ -236,7 +236,8 @@ async function getPath() {
     // Get distances, speed and time.
 
     // Appending text elements to display to user on screen. => Stations + Times.
-    document.getElementById("starting").innerHTML = "Starting at " + timeString[0] + ":" + timeString[1] + ":" + timeString[2] + " " + user.stationFrom;
+    document.getElementById("starting").innerHTML = "<strong>Starting at " + timeString[0] + ":" + timeString[1] + ":" + timeString[2] + " " + user.stationFrom + "</strong>"
+    + "<br></br><em>Click on station for more information. Please watch out for indicated notifications.</em>";
 
     let counter = startSeconds;
     for (let i = 0; i < segmentPathJSON.length - 1; i++) {
@@ -285,7 +286,7 @@ async function getPath() {
                     secondStartSeconds = Number(secondTimeString[0] * 60 * 60) + Number(secondTimeString[1] * 60) + Number(secondTimeString[2]);
                     break;
                 }
-                else if (Number(connectSchedules[i].split(':')[0]) == Number(secondGoalTime.split(':')[0])) {
+                else if (Number(connectSchedules[i].split(':')[0]) == Number(secondGoalTime.split(':')[0]) && Number(connectSchedules[i].split(':')[1]) >= Number(secondGoalTime.split(':')[1])) {
 
                     // Find closest minutes value. I'm using the reduce method, learned from class but I also looked it up on online documentation.
                     let secondGoalMinutes = Number(secondGoalTime.split(':')[1]) + 1;   // Realistically, let's give the user a minute before next departure to switch directions.
@@ -377,15 +378,13 @@ async function getPath() {
         }
     }
 
-
-
     for (let i = 1; i < segmentPathJSON.length; i++) {
         if (segmentPathJSON[i].Name == segmentPathJSON[i - 1].Name) {
             continue;
         }
 
         document.getElementById("stops").appendChild(document.createElement("li"))
-            .appendChild(document.createTextNode(segmentPathJSON[i].Name + ": Segment Id " + segmentPathJSON[i].SegmentId));
+            .appendChild(document.createTextNode(segmentPathJSON[i].Name + ": Segment " + segmentPathJSON[i].SegmentId));
 
         // Making elements clickable - the list ones. Took this from my SpaceX assignment.
         document.getElementById("stops").addEventListener("click", function (e) {
