@@ -56,10 +56,39 @@ function isValid(e) {
 
     console.log("this is the user time converted to " + user.time.toLocaleString('it-IT').split(',')[1]);
     console.log("This is ");
-    // When are we rejecting?
-    if (stationFrom == stationTo || user.time == "" || date < nowTime.toISOString().split('T')[0] || date == nowTime.toISOString().split('T')[0] && user.time.getHours() < nowTime.getHours() || date == nowTime.toISOString().split('T')[0] && user.time.getHours() == nowTime.getHours() && user.time.getMinutes() < nowTime.getMinutes())
-        alert("Error.");
 
+    // When are we rejecting?
+    if (stationFrom == stationTo && date != "" && document.getElementById("time").value != "") {
+        window.location.reload();
+        alert("Error. You cannot have the same destination as your starting point!");
+    }
+
+    else if (document.getElementById("time").value == "" && date != "") {
+        window.location.reload();
+        alert("Error. Please enter a time value!");
+    }
+
+    else if (document.getElementById("time").value == "" && date == "") {
+        window.location.reload();
+        alert("Error. Please enter a time and date values!");
+    }
+
+    else if (date < nowTime.toISOString().split('T')[0]) {
+        window.location.reload();
+        alert("Error. Please enter a today's date or later!");
+    }
+
+    else if (date == nowTime.toISOString().split('T')[0] && user.time.getHours() < nowTime.getHours()) {
+        window.location.reload();
+        alert("Error. Please enter this hour or later!");
+    }
+
+    else if (date == nowTime.toISOString().split('T')[0] && user.time.getHours() == nowTime.getHours() && user.time.getMinutes() < nowTime.getMinutes()) {
+        window.location.reload();
+        alert("Error. Please enter this minute or later!");
+    }
+
+    // If all conditions are met, user can now access to the path.
     else {
         getPath();
         // Resetting form. => how?   
@@ -248,7 +277,7 @@ async function getPath() {
 
             // This is the same process to retrieve times and calculations but based on segment switch.
             for (let i = 0; i < connectSchedules.length; i++) {
-                
+
                 if (secondGoalTime == connectSchedules[i]) {
                     secondTime = connectSchedules[i];
                     // Convert start point time to seconds.
@@ -259,17 +288,17 @@ async function getPath() {
                 else if (Number(connectSchedules[i].split(':')[0]) == Number(secondGoalTime.split(':')[0])) {
 
                     // Find closest minutes value. I'm using the reduce method, learned from class but I also looked it up on online documentation.
-                    let secondGoalMinutes = Number(secondGoalTime.split(':')[1]);
+                    let secondGoalMinutes = Number(secondGoalTime.split(':')[1]) + 1;   // Realistically, let's give the user a minute before next departure to switch directions.
 
                     // Adding to array.
                     for (let i = 0; i < connectSchedules.length; i++) {
-                        if (connectSchedules[i].split(':')[1] >= secondGoalMinutes)  
+                        if (connectSchedules[i].split(':')[1] >= secondGoalMinutes)
                             secondArrayMins.push(Number(connectSchedules[i].split(':')[1]));
                     }
 
                     console.log(secondArrayMins);
 
-                    
+
                     console.log(secondGoalMinutes);
 
                     secondTime = new Date("1970-01-01 " + connectSchedules[i].split(':')[0] + ":" + secondArrayMins.reduce(function (before, now) {
