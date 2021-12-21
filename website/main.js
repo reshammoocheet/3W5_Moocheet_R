@@ -8,7 +8,7 @@ document.getElementById("liveTime").innerHTML = nowTime.toString().split('G')[0]
 async function getNews() {
     let data = await (await fetch("https://inshortsapi.vercel.app/news?category=world")).json();
     document.getElementById("news").getElementsByTagName("p")[1].innerHTML = data.data[0].content
-    + "<br></br>Written by: " + data.data[0].author + ". Date: " + data.data[0].date.split(',')[0];
+        + "<br></br>Written by: " + data.data[0].author + ". Date: " + data.data[0].date.split(',')[0];
 }
 
 getNews();
@@ -89,6 +89,8 @@ async function getPath() {
     // Add to object.
     user.segmentId = segmentId;
 
+    let connectSchedules;
+
     // Get schedules from user startpoint. This returns an array of ALL stops.
     let schedulesDepart = await (await fetch("http://10.101.0.12:8080/schedule/" + user.stationFrom)).json();
 
@@ -102,8 +104,11 @@ async function getPath() {
         console.log(connections);
 
         // Same thing but with the second segment.
-        let connectSchedules = connections.map(({ Time }) => new Date(Time).toLocaleString('it-IT').split(',')[1]);
+        connectSchedules = connections.map(({ Time }) => new Date(Time).toLocaleString('it-IT').split(',')[1]);
         let goalTimeTwo; // calculate the time itll take after stops then loook up closest time.
+
+        console.log(connectSchedules);
+        console.log(goalTimeTwo);
     }
 
     console.log(user.segmentId);
@@ -156,9 +161,9 @@ async function getPath() {
             startSeconds = Number(timeString[0] * 60 * 60) + Number(timeString[1] * 60) + Number(timeString[2]);
         }
         else {
-            console.log("This is " + Number(departSchedules[i].split(':')[0]) + " second split " +Number(departSchedules[i].split(':')[1]) + " and " + Number(goalTime.split(':')[0]));
+            console.log("This is " + Number(departSchedules[i].split(':')[0]) + " second split " + Number(departSchedules[i].split(':')[1]) + " and " + Number(goalTime.split(':')[0]));
         }
-            
+
     }
     console.log("this is the closest value : " + theTime);
     console.log(startSeconds);
@@ -185,14 +190,67 @@ async function getPath() {
         counter += time;
         console.log("counter is " + Math.round(counter));
 
-        if (start == end)
-            continue;
-
         document.getElementById("timeStops").appendChild(document.createElement("li"))
             .appendChild(document.createTextNode(end + " at " + new Date(counter * 1000).toISOString().substring(11, 19)));
 
-        if (user.segmentId != segmentPathJSON[i].SegmentId) {
+        if (user.segmentId != segmentPathJSON[i + 1].SegmentId) {
             console.log("hey! change segments bro");
+
+            // Get closest value based on counter.
+            let secondGoalTime = new Date(counter * 1000).toISOString().substring(11, 19);
+            console.log(secondGoalTime);
+
+            let secondTime;
+
+            let secondArrayMins = [];
+
+            let secondTimeString;
+            let secondStartSeconds;
+
+            for (let i = 0; i < connectSchedules.length; i++) {
+                if (connectSchedules[i] == secondGoalTime)
+                    secondTime = connectSchedules[i];
+
+                else if (Number(connectSchedules[i].split(':')[0]) == Number(secondGoalTime.split(':')[0]) && Number(connectSchedules[i].split(':')[1] >= Number(secondGoalTime.split(':')[1]))) {
+                    
+                    console.log(Number(connectSchedules[i].split(':')[0]) + " and " + Number(secondGoalTime.split(':')[0]))
+                    // Using array reduce method again to find the closest value inside the newest schedules array.
+
+                    // Convert minutes format to Number so I can compare.
+                    console.log(Number(connectSchedules[i].split(':')[1]));
+
+                    // Adding to array.
+                    for (let i = 0; i < connectSchedules.length; i++) {
+                        if (connectSchedules[i].split(':')[1] > secondGoalTime.split(':')[1])   // Realistically, let's give the user a minute before next departure.
+                            secondArrayMins.push(Number(connectSchedules[i].split(':')[1]));
+                    }                    
+
+                    let secondGoalMinutes = Number(secondGoalTime.split(':')[1]) + 1;   
+
+                    console.log(secondArrayMins);
+
+                    secondTime = new Date("1970-01-01 " + Number(connectSchedules[i].split(':')[0]) + ":" + secondArrayMins.reduce(function (before, now) {
+                        return Math.abs(now - secondGoalMinutes) < Math.abs(before - secondGoalMinutes) ? now : before;
+                    }));
+
+                    console.log(secondGoalMinutes);
+
+                    console.log(secondTime);
+
+                    // Convert start point time to seconds.
+                    secondTimeString = secondTime.toLocaleString('it-IT').split(',')[1].split(':');
+                    secondStartSeconds = Number(secondTimeString[0] * 60 * 60) + Number(secondTimeString[1] * 60) + Number(secondTimeString[2]);
+                    
+                    console.log(secondTimeString);
+                    console.log(secondStartSeconds);
+                }
+                else
+                    console.log("this is " + connectSchedules[i] + " and " + secondGoalTime);
+
+            }
+
+            document.getElementById("timeStops").getElementsByTagName("li")[i - 1]
+                .appendChild(document.createTextNode(" Next Departure at " + new Date(secondStartSeconds * 1000).toISOString().substring(11, 19)));
             break;
         }
     }
