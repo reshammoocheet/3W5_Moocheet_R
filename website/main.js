@@ -239,7 +239,7 @@ async function getInfo(id) {
                 .appendChild(document.createTextNode(information[0].BicycleAvailability ? information[0].StreetName + " street and there is bicycle availability." : information[0].StreetName + " street and there is no bicycle availability."));
 
             // If the array is empty, nothing is displayed.
-            if (notification.length != 0) {
+            if (notification.length > 0) {
                 stops.getElementsByTagName("li")[i].lastChild.appendChild(document.createElement("p"))
                     .appendChild(document.createTextNode(""));
 
@@ -248,10 +248,10 @@ async function getInfo(id) {
                 let text = notification[0].Name + " - " + notification[0].Description;
 
                 // Changing color.
-                stops.getElementsByTagName("p")[1].style.color = 'red';
+                text.fontcolor('red');
                 function animateText() {
                     if (j < text.length) {
-                        stops.getElementsByTagName("p")[1].innerHTML += text.charAt(j);
+                        stops.getElementsByTagName("li")[i].lastElementChild.innerHTML += text.charAt(j);
                         j++;
                         setTimeout(animateText, 55);
                     }
