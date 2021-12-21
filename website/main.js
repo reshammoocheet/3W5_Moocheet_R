@@ -212,7 +212,7 @@ async function getPath() {
                     secondTime = connectSchedules[i];
 
                 else if (Number(connectSchedules[i].split(':')[0]) == Number(secondGoalTime.split(':')[0]) && Number(connectSchedules[i].split(':')[1] >= Number(secondGoalTime.split(':')[1]))) {
-                    
+
                     console.log(Number(connectSchedules[i].split(':')[0]) + " and " + Number(secondGoalTime.split(':')[0]))
                     // Using array reduce method again to find the closest value inside the newest schedules array.
 
@@ -223,9 +223,9 @@ async function getPath() {
                     for (let i = 0; i < connectSchedules.length; i++) {
                         if (connectSchedules[i].split(':')[1] > secondGoalTime.split(':')[1])   // Realistically, let's give the user a minute before next departure.
                             secondArrayMins.push(Number(connectSchedules[i].split(':')[1]));
-                    }                    
+                    }
 
-                    let secondGoalMinutes = Number(secondGoalTime.split(':')[1]) + 1;   
+                    let secondGoalMinutes = Number(secondGoalTime.split(':')[1]) + 1;
 
                     console.log(secondArrayMins);
 
@@ -240,7 +240,7 @@ async function getPath() {
                     // Convert start point time to seconds.
                     secondTimeString = secondTime.toLocaleString('it-IT').split(',')[1].split(':');
                     secondStartSeconds = Number(secondTimeString[0] * 60 * 60) + Number(secondTimeString[1] * 60) + Number(secondTimeString[2]);
-                    
+
                     console.log(secondTimeString);
                     console.log(secondStartSeconds);
                 }
@@ -251,6 +251,35 @@ async function getPath() {
 
             document.getElementById("timeStops").getElementsByTagName("li")[i - 1]
                 .appendChild(document.createTextNode(" Next Departure at " + new Date(secondStartSeconds * 1000).toISOString().substring(11, 19)));
+
+            // Removing duplicate elements (segment switch) in list of stops and times.
+            document.getElementById("timeStops").removeChild(document.getElementById("timeStops").getElementsByTagName("li")[i]);
+            
+
+            let secondCounter = secondStartSeconds;
+            for (let j = i; j < segmentPathJSON.length - 1; j++) {
+                // Get distance between stations.
+                let start = segmentPathJSON[j].Name;
+
+                let end = segmentPathJSON[j + 1].Name;
+
+                if (start == end)
+                    continue;
+
+                // Speed value.
+                let speed = await (await fetch("http://10.101.0.12:8080/averageTrainSpeed")).json();
+
+                // *** To solve for time, t = d/s. ***
+                let distance = await (await fetch("http://10.101.0.12:8080/distance/" + start + "/" + end)).json();
+
+                let time = (distance / speed[0].AverageSpeed) * 60 * 60;
+                console.log(" this is how long from " + start + " to " + end + " : " + time + " seconds.");
+                secondCounter += time;
+                console.log("counter is " + Math.round(secondCounter));
+
+                document.getElementById("timeStops").appendChild(document.createElement("li"))
+                    .appendChild(document.createTextNode(end + " at " + new Date(secondCounter * 1000).toISOString().substring(11, 19)));
+            }
             break;
         }
     }
@@ -276,6 +305,7 @@ async function getPath() {
         });
     }
 }
+
 async function getInfo(id) {
     // We are getting station information AND notifications (if there are any).
     // Fetching station information.
