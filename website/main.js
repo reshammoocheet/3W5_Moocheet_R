@@ -252,12 +252,11 @@ async function getPath() {
                 if (secondGoalTime == connectSchedules[i]) {
                     secondTime = connectSchedules[i];
                     // Convert start point time to seconds.
-                    secondTimeString = theTime.toLocaleString('it-IT').split(',')[1].split(':');
-                    secondStartSeconds = Number(timeString[0] * 60 * 60) + Number(secondTimeString[1] * 60) + Number(secondTimeString[2]);
+                    secondTimeString = secondTime.split(':');
+                    secondStartSeconds = Number(secondTimeString[0] * 60 * 60) + Number(secondTimeString[1] * 60) + Number(secondTimeString[2]);
                     break;
                 }
-
-                else if (connectSchedules[i].split(':')[0] == secondGoalTime.split(':')[0] && Number(connectSchedules[i].split(':')[1]) >= Number(secondGoalTime.split(':')[1])) {
+                else if (Number(connectSchedules[i].split(':')[0]) == Number(secondGoalTime.split(':')[0])) {
 
                     // Find closest minutes value. I'm using the reduce method, learned from class but I also looked it up on online documentation.
                     let secondGoalMinutes = Number(secondGoalTime.split(':')[1]);
@@ -273,7 +272,7 @@ async function getPath() {
                     
                     console.log(secondGoalMinutes);
 
-                    secondTime = new Date("1970-01-01 " + user.time.getHours() + ":" + secondArrayMins.reduce(function (before, now) {
+                    secondTime = new Date("1970-01-01 " + connectSchedules[i].split(':')[0] + ":" + secondArrayMins.reduce(function (before, now) {
                         return Math.abs(now - secondGoalMinutes) < Math.abs(before - secondGoalMinutes) ? now : before;
                     }));
 
@@ -285,6 +284,7 @@ async function getPath() {
                 else if (Number(connectSchedules[i].split(':')[0]) == (Number(secondGoalTime.split(':')[0]) + 1)) {
                     // This is in case it's like 12:57, we go to the next hour and repeat the same process of finding the closest minute.
                     // Adding to array.
+                    console.log(connectSchedules[i] + " " + secondGoalTime);
                     for (let i = 0; i < connectSchedules.length; i++) {
                         secondArrayMins.push(Number(connectSchedules[i].split(':')[1]));
                     }
