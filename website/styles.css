@@ -61,7 +61,7 @@ select:hover {
 input {
     border-radius: 0.5em;
     padding: 0.5em;
-    transition-duration: 0.5s;
+    transition-duration: 0.4s;
     box-shadow: 0 1px 3px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
 
@@ -73,7 +73,7 @@ input:hover {
 
 button {
     padding: 0.65em;
-    transition-duration: 0.5s;
+    transition-duration: 0.4s;
     background-color: white;
     border-radius: 0.5em;
     border-style: none;
