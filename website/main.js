@@ -13,7 +13,7 @@ async function getNews() {
     let nasaAPOD = await (await fetch("https://api.nasa.gov/planetary/apod?api_key=xtEpdZgOV6tZfo9n7drMUyVCt2Ggja7iCqWDyDUt&date=2020-" + date.split('-')[1] + "-" + date.split('-')[2])).json();
     
     // The date the user chooses directly relates to a date in NASA's library. Note that all dates are "converted" to 2020 for the sake of the API's functionality.
-    document.getElementById("news").getElementsByTagName("p")[0].innerHTML += date;
+    document.getElementById("news").getElementsByTagName("p")[0].innerHTML += nasaAPOD.date;
     
     document.getElementById("news").getElementsByTagName("p")[1].innerHTML = nasaAPOD.explanation;
 
@@ -80,7 +80,7 @@ function isValid(e) {
         alert("Error. Please enter a time and date values!");
     }
 
-    else if (date.split('-')[2] < nowTime.toLocaleDateString().split('/')[1]) {
+    else if (date.split('-')[0] < nowTime.toLocaleDateString().split('/')[0] && date.split('-')[2] < nowTime.toLocaleDateString().split('/')[1]) {
         window.location.reload();
         alert("Error. Please enter a today's date or later!");
     }
