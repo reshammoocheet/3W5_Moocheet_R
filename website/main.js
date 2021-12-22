@@ -4,8 +4,7 @@ let nowTime = new Date(); // global variable for current time.
 document.getElementById("liveTime").innerHTML = nowTime.toLocaleDateString();
 document.getElementById("liveTime").style.boxShadow = '1px 2px 0 rgba(0,0,0,0.24), 0 4px 4px 0 rgba(0,0,0,0.19)';
 
-// External APIs. First one I'm using is worldwide data.
-// Credit to inshortsapi.vercel.app.
+// External APIs. Using NASA's open API, taking user's date values and looking through NASA's 2020 repertoire.
 async function getNews() {
     
     let date = document.getElementById("date").value;
