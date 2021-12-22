@@ -8,12 +8,17 @@ document.getElementById("liveTime").style.boxShadow = '1px 2px 0 rgba(0,0,0,0.24
 // External APIs. First one I'm using is worldwide data.
 // Credit to inshortsapi.vercel.app.
 async function getNews() {
-    let data = await (await fetch("https://inshortsapi.vercel.app/news?category=world")).json();
-    document.getElementById("news").getElementsByTagName("p")[1].innerHTML = data.data[0].content
-        + "<br></br><em>Author: " + data.data[0].author + ". Date: " + data.data[0].date.split(',')[0] + "</em>";
-}
+    
+    let date = document.getElementById("date").value;
+    let nasaAPOD = await (await fetch("https://api.nasa.gov/planetary/apod?api_key=xtEpdZgOV6tZfo9n7drMUyVCt2Ggja7iCqWDyDUt&date=2020-" + date.split('-')[1] + "-" + date.split('-')[2])).json();
+    
+    // The date the user chooses directly relates to a date in NASA's library. Note that all dates are "converted" to 2020 for the sake of the API's functionality.
+    document.getElementById("news").getElementsByTagName("p")[0].innerHTML += date;
+    
+    document.getElementById("news").getElementsByTagName("p")[1].innerHTML = nasaAPOD.explanation;
 
-getNews();
+    document.getElementById("news").getElementsByTagName("img")[0].src = nasaAPOD.url;
+}
 
 class User {
     constructor(role, stationFrom, stationTo, segmentId, finalSegmentId, time) {
@@ -93,12 +98,14 @@ function isValid(e) {
     // If all conditions are met, user can now access to the path.
     else {
         getPath();
+        getNews(); // Fetching external API.
         // Resetting form. => how?   
     }
 }
 
 async function getPath() {
 
+     
     // Get stops.
     let segmentPath = await fetch("http://10.101.0.12:8080/path/" + user.stationFrom + "/" + user.stationTo);
     let segmentPathJSON = await segmentPath.json();

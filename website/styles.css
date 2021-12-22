@@ -27,6 +27,8 @@ li {
     box-shadow: 0 1px 3px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
     padding: 1.5em;
     border-radius: 0.6em;
+    display: flex;
+    flex-direction: column;
 }
 
 li p {
@@ -127,6 +129,10 @@ li {
     flex : 1;
     padding-left: 2em;
     margin-left: 10px;
+}
+
+#news img {
+    align-self: center;
 }
 
 /* Zooming effect on image - inspo taken from w3Schools online documentation. */
