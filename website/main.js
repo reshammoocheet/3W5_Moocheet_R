@@ -57,7 +57,9 @@ function isValid(e) {
     };
 
     let date = document.getElementById("date").value;
-    console.log(new Date(date));
+    
+    console.log(date);
+
     console.log(nowTime.toLocaleDateString());
 
     console.log("this is the user time converted to " + user.time.toLocaleString('it-IT').split(',')[1]);
@@ -77,11 +79,6 @@ function isValid(e) {
     else if (document.getElementById("time").value == "" && date == "") {
         window.location.reload();
         alert("Error. Please enter a time and date values!");
-    }
-
-    else if (date.split('-')[0] < nowTime.toLocaleDateString().split('/')[0] && date.split('-')[2] < nowTime.toLocaleDateString().split('/')[1]) {
-        window.location.reload();
-        alert("Error. Please enter a today's date or later!");
     }
 
     else if (date == nowTime.toISOString().split('T')[0] && user.time.getHours() < nowTime.getHours()) {
