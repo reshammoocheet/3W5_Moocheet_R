@@ -1,3 +1,4 @@
+
 let nowTime = new Date(); // global variable for current time.
 
 // Let's display the date. Got the string from month thanks to online documentation.
@@ -52,8 +53,8 @@ function isValid(e) {
     };
 
     let date = document.getElementById("date").value;
-    console.log(date);
-    console.log(nowTime.toISOString().split('T')[0]);
+    console.log(new Date(date));
+    console.log(nowTime.toLocaleDateString());
 
     console.log("this is the user time converted to " + user.time.toLocaleString('it-IT').split(',')[1]);
     console.log("This is ");
@@ -74,7 +75,7 @@ function isValid(e) {
         alert("Error. Please enter a time and date values!");
     }
 
-    else if (date < nowTime.toISOString().split('T')[0]) {
+    else if (date.split('-')[2] < nowTime.toLocaleDateString().split('/')[1]) {
         window.location.reload();
         alert("Error. Please enter a today's date or later!");
     }
