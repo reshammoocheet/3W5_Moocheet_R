@@ -1,4 +1,3 @@
-
 let nowTime = new Date(); // global variable for current time.
 
 // Let's display the date. Got the string from month thanks to online documentation.
@@ -98,14 +97,12 @@ function isValid(e) {
     // If all conditions are met, user can now access to the path.
     else {
         getPath();
-        getNews(); // Fetching external API.
-        // Resetting form. => how?   
+        getNews(); // Fetching external API. 
     }
 }
 
 async function getPath() {
 
-     
     // Get stops.
     let segmentPath = await fetch("http://10.101.0.12:8080/path/" + user.stationFrom + "/" + user.stationTo);
     let segmentPathJSON = await segmentPath.json();
@@ -134,36 +131,21 @@ async function getPath() {
 
     // Get schedules from user connecting segment.
     if (finalSegment.length != 0) {
-        console.log(finalSegment);
         let schedulesConnect = await (await fetch("http://10.101.0.12:8080/schedule/" + finalSegment[0])).json();
 
         // Only consider times from second segment.
         let connections = schedulesConnect.filter(schedule => schedule.SegmentId == user.finalSegmentId);
-        console.log(connections);
 
         // Same thing but with the second segment.
         connectSchedules = connections.map(({ Time }) => new Date(Time).toISOString().split("T")[1].split(".")[0]);
-        let goalTimeTwo; // calculate the time itll take after stops then loook up closest time.
-
-        console.log(connectSchedules);
-        console.log(goalTimeTwo);
     }
 
-    console.log(user.segmentId);
-
-    console.log(schedulesDepart[0].SegmentId);
     // Only consider times from first segment.
     let departures = schedulesDepart.filter(schedule => schedule.SegmentId == user.segmentId);
-    console.log(departures);
 
     // We want the time values only, no objects just raw data inside an array. 
     let departSchedules = departures.map(({ Time }) => new Date(Time).toISOString().split("T")[1].split(".")[0]);
     let goalTime = user.time.toLocaleString('it-IT').split(',')[1];
-
-    console.log(new Date(departures[0].Time));
-    console.log(departSchedules[0]);
-    console.log("this is the goal minutes " + goalTime.split(':')[1]);
-    console.log("this is example of api schedules " + departSchedules + " which contains " + departSchedules.length + " elements");
 
     // Get closest time to user's selected time. 
     let arrayMins = [];
@@ -194,11 +176,6 @@ async function getPath() {
                 if (departSchedules[i].split(':')[1] >= goalMinutes)
                     arrayMins.push(Number(departSchedules[i].split(':')[1]));
             }
-
-            console.log(arrayMins);
-
-
-            console.log(goalMinutes);
 
             theTime = new Date("1970-01-01 " + user.time.getHours() + ":" + arrayMins.reduce(function (before, now) {
                 return Math.abs(now - goalMinutes) < Math.abs(before - goalMinutes) ? now : before;
@@ -241,10 +218,6 @@ async function getPath() {
         }
 
     }
-    console.log("this is the closest value : " + theTime);
-    console.log(startSeconds);
-    console.log(timeString);
-
     // Display station names from-to destination - so in-between locations.
     // Get distances, speed and time.
 
@@ -267,10 +240,9 @@ async function getPath() {
         let distance = await (await fetch("http://10.101.0.12:8080/distance/" + start + "/" + end)).json();
 
         let time = (distance / speed[0].AverageSpeed) * 60 * 60;
-        console.log(" this is how long from " + start + " to " + end + " : " + time + " seconds.");
+        
         counter += time;
-        console.log("counter is " + Math.round(counter));
-
+        
         document.getElementById("timeStops").appendChild(document.createElement("li"))
             .appendChild(document.createTextNode(end + " at " + new Date(counter * 1000).toISOString().substring(11, 19)));
 
@@ -310,11 +282,6 @@ async function getPath() {
                             secondArrayMins.push(Number(connectSchedules[i].split(':')[1]));
                     }
 
-                    console.log(secondArrayMins);
-
-
-                    console.log(secondGoalMinutes);
-
                     secondTime = new Date("1970-01-01 " + connectSchedules[i].split(':')[0] + ":" + secondArrayMins.reduce(function (before, now) {
                         return Math.abs(now - secondGoalMinutes) < Math.abs(before - secondGoalMinutes) ? now : before;
                     }));
@@ -324,32 +291,23 @@ async function getPath() {
                     secondStartSeconds = Number(secondTimeString[0] * 60 * 60) + Number(secondTimeString[1] * 60) + Number(secondTimeString[2]);
                     break;
                 }
-                else if (Number(connectSchedules[i].split(':')[0]) == (Number(secondGoalTime.split(':')[0]) + 1)) {
-                    // This is in case it's like 12:57, we go to the next hour and repeat the same process of finding the closest minute.
+                // This is in case it's like 12:57, we go to the next hour and repeat the same process of finding the closest minute.
+                else if (Number(connectSchedules[i].split(':')[0]) == (Number(secondGoalTime.split(':')[0]) + 1)) {                    
+                    
                     // Adding to array.
-                    console.log(connectSchedules[i] + " " + secondGoalTime);
                     for (let i = 0; i < connectSchedules.length; i++) {
                         secondArrayMins.push(Number(connectSchedules[i].split(':')[1]));
                     }
-                    let secondGoalMinutes = 0;
-
-                    console.log(secondGoalMinutes);
-                    console.log(secondArrayMins);
+                    
+                    let secondGoalMinutes = 0;  // Because we go to the next hour, we go to 00.
 
                     secondTime = new Date("1970-01-01 " + (Number(secondGoalTime.split(':')[0]) + 1) + ":" + secondArrayMins.reduce(function (before, now) {
                         return Math.abs(now - secondGoalMinutes) < Math.abs(before - secondGoalMinutes) ? now : before;
                     }));
 
-                    console.log(secondGoalMinutes);
-
-                    console.log(secondTime);
-
                     // Convert start point time to seconds.
                     secondTimeString = secondTime.toLocaleString('it-IT').split(',')[1].split(':');
                     secondStartSeconds = Number(secondTimeString[0] * 60 * 60) + Number(secondTimeString[1] * 60) + Number(secondTimeString[2]);
-
-                    console.log(secondTimeString);
-                    console.log(secondStartSeconds);
                     break;
                 }
                 else {
@@ -362,7 +320,6 @@ async function getPath() {
 
             // Removing duplicate elements (segment switch) in list of stops and times.
             document.getElementById("timeStops").removeChild(document.getElementById("timeStops").getElementsByTagName("li")[i]);
-
 
             let secondCounter = secondStartSeconds;
             for (let j = i; j < segmentPathJSON.length - 1; j++) {
@@ -381,9 +338,8 @@ async function getPath() {
                 let distance = await (await fetch("http://10.101.0.12:8080/distance/" + start + "/" + end)).json();
 
                 let time = (distance / speed[0].AverageSpeed) * 60 * 60;
-                console.log(" this is how long from " + start + " to " + end + " : " + time + " seconds.");
+
                 secondCounter += time;
-                console.log("counter is " + Math.round(secondCounter));
 
                 document.getElementById("timeStops").appendChild(document.createElement("li"))
                     .appendChild(document.createTextNode(end + " at " + new Date(secondCounter * 1000).toISOString().substring(11, 19)));
@@ -403,7 +359,7 @@ async function getPath() {
         // Making elements clickable - the list ones. Took this from my SpaceX assignment.
         document.getElementById("stops").addEventListener("click", function (e) {
             e.preventDefault();
-            console.log(e.target.innerHTML.split(':')[0]);
+
             if (e.target.innerHTML.split(':')[0] == segmentPathJSON[i].Name) {
                 // name of function that we're calling.
                 getInfo(segmentPathJSON[i].StationId);
@@ -425,12 +381,9 @@ async function getInfo(id) {
     
     for (let i = 0; i < stops.getElementsByTagName("li").length; i++) {
         stops.getElementsByTagName("li")[i].disabled = true;
-        console.log(information[0].Name);
-
-        console.log(stops.getElementsByTagName("li")[0].innerHTML);
 
         if (stops.getElementsByTagName("li")[i].innerHTML.split(':')[0] == information[0].Name) {
-            console.log("match !" + stops.getElementsByTagName("li")[i].innerHTML.split(':')[0] + " and " + information[0].Name);
+
             stops.getElementsByTagName("li")[i].appendChild(document.createElement("p"))
                 .appendChild(document.createTextNode(information[0].BicycleAvailability ? information[0].StreetName + " street and there is bicycle availability." : information[0].StreetName + " street and there is no bicycle availability."));
 
@@ -443,8 +396,6 @@ async function getInfo(id) {
                 let j = 0;
                 let text = "☝️ "+ notification[0].Name + " - " + notification[0].Description;
 
-                // Changing color.
-                text.fontcolor('red');
                 function animateText() {
                     if (j < text.length) {
                         stops.getElementsByTagName("li")[i].lastElementChild.innerHTML += text.charAt(j);
@@ -453,7 +404,6 @@ async function getInfo(id) {
                     }
                 }
                 
-
                 // Calling the animate function.
                 animateText();
                 
