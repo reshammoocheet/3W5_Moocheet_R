@@ -130,11 +130,11 @@ async function getPath() {
         let schedulesConnect = await (await fetch("http://10.101.0.12:8080/schedule/" + finalSegment[0])).json();
 
         // Only consider times from second segment.
-        let connections = schedulesConnect.filter(schedule => schedule.SegmentId == finalSegment[1]);
+        let connections = schedulesConnect.filter(schedule => schedule.SegmentId == user.finalSegmentId);
         console.log(connections);
 
         // Same thing but with the second segment.
-        connectSchedules = connections.map(({ Time }) => new Date(Time).toLocaleString('it-IT').split(',')[1]);
+        connectSchedules = connections.map(({ Time }) => new Date(Time).toISOString().split("T")[1].split(".")[0]);
         let goalTimeTwo; // calculate the time itll take after stops then loook up closest time.
 
         console.log(connectSchedules);
@@ -143,14 +143,17 @@ async function getPath() {
 
     console.log(user.segmentId);
 
+    console.log(schedulesDepart[0].SegmentId);
     // Only consider times from first segment.
     let departures = schedulesDepart.filter(schedule => schedule.SegmentId == user.segmentId);
     console.log(departures);
 
     // We want the time values only, no objects just raw data inside an array. 
-    let departSchedules = departures.map(({ Time }) => new Date(Time).toLocaleString('it-IT').split(',')[1]);
+    let departSchedules = departures.map(({ Time }) => new Date(Time).toISOString().split("T")[1].split(".")[0]);
     let goalTime = user.time.toLocaleString('it-IT').split(',')[1];
 
+    console.log(new Date(departures[0].Time));
+    console.log(departSchedules[0]);
     console.log("this is the goal minutes " + goalTime.split(':')[1]);
     console.log("this is example of api schedules " + departSchedules + " which contains " + departSchedules.length + " elements");
 
@@ -173,7 +176,7 @@ async function getPath() {
             break;
         }
 
-        else if (departSchedules[i].split(':')[0] == goalTime.split(':')[0] && Number(departSchedules[i].split(':')[1]) >= Number(goalTime.split(':')[1])) {
+        else if (Number(departSchedules[i].split(':')[0]) == Number(goalTime.split(':')[0]) && Number(departSchedules[i].split(':')[1]) >= Number(goalTime.split(':')[1])) {
 
             // Find closest minutes value. I'm using the reduce method, learned from class but I also looked it up on online documentation.
             let goalMinutes = Number(goalTime.split(':')[1]);
@@ -225,8 +228,9 @@ async function getPath() {
             console.log(startSeconds);
             break;
         }
-        else
+        else {
             continue;
+        }
 
     }
     console.log("this is the closest value : " + theTime);
@@ -340,8 +344,9 @@ async function getPath() {
                     console.log(secondStartSeconds);
                     break;
                 }
-                else
+                else {
                     continue;
+                }                    
             }
 
             document.getElementById("timeStops").getElementsByTagName("li")[i - 1]
